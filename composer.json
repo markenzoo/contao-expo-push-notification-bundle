@@ -1,0 +1,69 @@
+{
+  "name": "markenzoo/contao-expo-push-notification-bundle",
+  "type": "contao-bundle",
+  "description": "Push Notifications for Expo (React Native) in Contao 4",
+  "keywords":["contao","bundle","react", "expo", "app"],
+  "homepage": "https://github.com/markenzoo/contao-expo-push-notification-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "markenzoo",
+      "homepage": "https://www.markenzoo.de",
+      "email" : "kaestner@markenzoo.de",
+      "role" : "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.2",
+    "contao/core-bundle": "4.9",
+    "symfony/framework-bundle": "^4.4",
+    "solvecrew/expo-notifications-bundle" : "^1.2.1"
+  },
+  "conflict": {
+    "contao/core": "*",
+    "contao/manager-plugin": "<2.0 || >=3.0"
+  },
+  "require-dev": {
+    "contao/manager-plugin": "^2.0",
+    "friendsofphp/php-cs-fixer": "^2.0",
+    "phpunit/phpunit": "^8.5",
+    "symfony/phpunit-bridge": "^4.4",
+    "vimeo/psalm": "^3.9"
+  },
+  "extra": {
+    "contao-manager-plugin": "Markenzoo\\ContaoExpoPushNotificationBundle\\ContaoManager\\Plugin"
+  },
+  "autoload": {
+    "psr-4": {
+      "Markenzoo\\ContaoExpoPushNotificationBundle\\": "src/"
+    },
+    "classmap": [
+      "src/Resources/contao/"
+    ],
+    "exclude-from-classmap": [
+        "src/Resources/contao/config/",
+        "src/Resources/contao/dca/",
+        "src/Resources/contao/languages/",
+        "src/Resources/contao/templates/"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Markenzoo\\ContaoExpoPushNotificationBundle\\Tests\\": "tests/"
+    }
+  },
+  "support": {
+    "email" : "kaestner@markenzoo.de",
+    "issues": "https://github.com/markenzoo/contao-expo-push-notification-bundle/issues",
+    "source": "https://github.com/markenzoo/contao-expo-push-notification-bundle"
+  },
+  "scripts": {
+    "test": "phpunit",
+    "fix": "php-cs-fixer fix",
+    "lint": "psalm",
+    "lint:fix": "psalter --issues=all --dry-run"
+  },
+  "suggest": {
+    "markenzoo/contao-file-helper-bundle": "Markenzoo File Helper extends the file manager to show where files are included and to edit these elements with one click. / Die Markenzoo File Helper Erweiterung erlaubt es in der Dateiverwaltung anzeigen zu lassen, wo Dateien eingebunden sind und diese Elemente mit einem Klick zu bearbeiten."
+  }
+}

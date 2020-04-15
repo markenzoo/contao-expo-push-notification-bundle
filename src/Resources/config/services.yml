@@ -1,0 +1,18 @@
+services:
+    Markenzoo\ContaoExpoPushNotificationBundle\Controller\ExpoPushNotificationController:
+        tags: ['controller.service_arguments']
+
+    Markenzoo\ContaoExpoPushNotificationBundle\Repository\ExpoPushTokenRepository:
+        tags: ['doctrine.repository_service']
+        arguments:
+            - '@doctrine'
+
+    sc_expo_notifications.guzzle_client:
+       class: GuzzleHttp\Client
+       arguments: []
+       public: true
+
+    sc_expo_notifications.notification_manager:
+       class: Solvecrew\ExpoNotificationsBundle\Manager\NotificationManager
+       arguments: ['@doctrine.orm.entity_manager', '@sc_expo_notifications.guzzle_client', 'https://exp.host/--/api/v2/push/send']
+       public: true
