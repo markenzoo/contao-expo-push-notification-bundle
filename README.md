@@ -199,6 +199,97 @@ export default class AppContainer extends React.Component {
 
 **That's it !** 🎉
 
+### Hooks
+
+"Hooks are entry points into the Contao core (and some of its extension bundles). You can register your own callable logic that will be executed as soon as a certain point in the execution flow of the core will be reached."
+Read more on Hooks and how to use them in the [Contao Documentation](https://docs.contao.org/dev/framework/hooks/)
+
+This extension provides the following hooks, to extend functionality:
+
+**loadPushNotificationData** 
+
+This hook is triggered when the data of the push notification is loaded. It passes the ExpoPushNotificationModel object and
+and an array of the parsed data from the selected content element. This hook can be used to dynamically alter or extend a 
+the data send with the push notification.
+
+Parameters:
+  - _\Markenzoo\ContaoExpoPushNotificationBundle\Model\ExpoPushNotificationModel_ `$objModel`
+  - _array_ `$arrData`
+
+Return:
+  - _array_ `$arrData - The modified array of data send
+
+Example Usage:
+
+```php
+// src/EventListener/LoadPushNotificationDataListener.php
+namespace App\EventListener;
+
+use Contao\CoreBundle\ServiceAnnotation\Hook;
+use Contao\FrontendTemplate;
+use Contao\Module;
+use Terminal42\ServiceAnnotationBundle\ServiceAnnotationInterface;
+use Markenzoo\ContaoExpoPushNotificationBundle\Model\ExpoPushNotificationModel;
+
+class LoadPushNotificationDataListener implements ServiceAnnotationInterface
+{
+    /**
+     * @Hook("loadPushNotificationData")
+     */
+    public function onLoadPushNotificationData(ExpoPushNotificationModel $objModel, array $arrData): array
+    {
+        // Filter out all empty strings and null values if you don't use them to make message smaller
+        $arrData = array_filter($arrData, function($value) { return !is_null($value) && $value !== ''; });
+
+        // Always make sure to return the modified array
+        return $arrData;
+    }
+}
+```
+
+**parsePushNotificationResponse** 
+
+This hook is triggered after the push notifications have been sent and a http response is returned. It passes 
+an array of the returned HTTP Response which conteins information about each Notification. 
+This hook can be used to dynamically add functionality.
+
+Parameters:
+  - _array_ `$arrData`
+
+Return:
+  - _void_
+
+Example Usage:
+
+```php
+// src/EventListener/ParsePushNotificationResponseListener.php
+namespace App\EventListener;
+
+use Contao\CoreBundle\ServiceAnnotation\Hook;
+use Contao\FrontendTemplate;
+use Contao\Module;
+use Terminal42\ServiceAnnotationBundle\ServiceAnnotationInterface;
+
+class ParsePushNotificationResponseListener implements ServiceAnnotationInterface
+{
+    /**
+     * @Hook("parsePushNotificationResponse")
+     */
+    public function onParsePushNotificationResponse(array $arrData): void
+    {
+        // Loop through each notification and get it's respons
+        foreach ($arrData as $response) {
+            // if something went wrong, the returned status is not ok
+            if ('ok' !== $response['status']) {
+                
+                // Do some custom logic ...
+
+            }
+        }
+    }
+}
+```
+
 ### Further Reading
 
 - [Expo Documentation](https://docs.expo.io/versions/latest/guides/push-notifications/)

@@ -79,10 +79,18 @@ class ExpoPushNotifications extends Backend
         $arrData = [];
         if ($objNotification->data) {
             $objElement = ContentModel::findByPk((int) $objNotification->data);
-            $arrData = array_filter($objElement->row());
+            $arrData = $objElement->row();
         }
         $arrData['title'] = $objNotification->title;
         $arrData['message'] = $objNotification->message;
+
+        if (isset($GLOBALS['TL_HOOKS']['loadPushNotificationData']) && \is_array($GLOBALS['TL_HOOKS']['loadPushNotificationData'])) {
+            foreach ($GLOBALS['TL_HOOKS']['loadPushNotificationData'] as $callback) {
+                $this->import($callback[0]);
+                $arrData = $this->{$callback[0]}->{$callback[1]}($objNotification, $arrData);
+            }
+        }
+
         $notificationContentModel->setData($arrData);
 
         // set notification priority
@@ -126,6 +134,13 @@ class ExpoPushNotifications extends Backend
 
         // Send the notifications.
         $httpResponse = $notificationManager->sendNotificationsHttp($notificationContentModels);
+
+        if (isset($GLOBALS['TL_HOOKS']['parsePushNotificationResponse']) && \is_array($GLOBALS['TL_HOOKS']['parsePushNotificationResponse'])) {
+            foreach ($GLOBALS['TL_HOOKS']['parsePushNotificationResponse'] as $callback) {
+                $this->import($callback[0]);
+                $arrData = $this->{$callback[0]}->{$callback[1]}($httpResponse);
+            }
+        }
 
         foreach ($httpResponse as $response) {
             if ('ok' !== $response['status']) {
