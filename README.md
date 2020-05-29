@@ -13,9 +13,9 @@ This extension provides a Contao CMS integration of push notifications for [Reac
 Features
 --------
 
-This extension for Contao 4.9 allow user to incooperate a Contao Backend into a mobile app made with react native and expo.
+This extension for Contao 4.9 (and above) allows user to incooperate a Contao Backend into a mobile app made with react native and expo.
 Upon start of the mobile app a user will register against a backend service with a notification token. 
-This token wil then be used to trigger custom push notifications from the Contao Backend on the device.
+This token will then be used to trigger custom push notifications from the Contao Backend on the device.
 For further information see: [here](https://docs.expo.io/versions/latest/guides/push-notifications/)
  
 Requirements
@@ -72,8 +72,7 @@ In order to send a push notification to a mobile app, providers need to identify
     <img alt="Send a token to your backend" src="https://docs.expo.io/static/images/saving-token.png" width="680">
 </p>
 
-This extensions for Contao provides a [Controller](https://github.com/markenzoo/contao-expo-push-notification-bundle/blob/master/src/Controller/ExpoPushNotificationController.php) which handles requests to store a token in the database used by your Contao installation. The table used for storing theses
-tokens is called `tl_expo_push_notification_token`. All you need to do is to send a `POST`-Request to the Endpoint `https://your-server.com/api/notifications` with the token from your mobile app. (Where "https://your-server.com" is the domain of your website and /api/notifications is the endpoint of the above mentioned controller.)
+This extensions for Contao provides a [Controller](https://github.com/markenzoo/contao-expo-push-notification-bundle/blob/master/src/Controller/ExpoPushNotificationController.php) which handles requests to store a token in the database used by your Contao installation. The table used for storing tokens is called `tl_expo_push_notification_token`. All you need to do is to send a `POST`-Request to the Endpoint `https://your-server.com/api/notifications` with the token from your mobile app. (Where "https://your-server.com" is the domain of your website and /api/notifications is the endpoint of the above mentioned controller.)
 
 Take for example the following implementation and store it in a file called `pushNotificationsAsync.js`.
 Remember to replace "https://your-server.com" with the domain of your website.
@@ -133,7 +132,7 @@ The benefit this extensions for Contao CMS provides, is that you can send them d
 </p>
 
 **Note**:
-For Android, you'll also need  generate a Firebase Cloud Messaging server key and upload it to Expo so that Expo can send notifications to your app. **This step is necessary** unless you are not creating your own APK and using just the Expo client app from Google Play. To do so, follow the guide on [Using FCM for Push Notifications](https://docs.expo.io/versions/latest/guides/using-fcm/) to learn how to create a Firebase project, get your FCM server key, and upload the key to Expo. 
+For Android, you'll also need generate a Firebase Cloud Messaging server key and upload it to Expo so that Expo can send notifications to your app. **This step is necessary** unless you are not creating your own APK and using just the Expo client app from Google Play. To do so, follow the guide on [Using FCM for Push Notifications](https://docs.expo.io/versions/latest/guides/using-fcm/) to learn how to create a Firebase project, get your FCM server key, and upload the key to Expo. 
 
 ---
 
@@ -156,7 +155,7 @@ You can send Push Notifications by navigating to `Push Notifications in the Cont
 
 You will no receive push notifications on your mobile app, which will appear in the system notification tray as you've come to expect, and tapping them will open/foreground the app. If your notifications are purely informational and you have no desire to handle them when they are received or selected, you're already done. 
 
-But Expo provides the capabilities to do much more ! Maybe you want to update the UI based on the notification, or maybe navigate to a particular screen if a notification was selected. All you need to do is add a listener using the Notifications API. You can take e.g. the following implementation.
+But Expo provides the capabilities to do much more! Maybe you want to update the UI based on the notification, or maybe navigate to a particular screen if a notification was selected. All you need to do is add a listener using the Notifications API. You can take e.g. the following implementation.
 
 ```javascript
 import React from 'react';
@@ -198,97 +197,6 @@ export default class AppContainer extends React.Component {
 ```
 
 **That's it !** 🎉
-
-### Hooks
-
-"Hooks are entry points into the Contao core (and some of its extension bundles). You can register your own callable logic that will be executed as soon as a certain point in the execution flow of the core will be reached."
-Read more on Hooks and how to use them in the [Contao Documentation](https://docs.contao.org/dev/framework/hooks/)
-
-This extension provides the following hooks, to extend functionality:
-
-**loadPushNotificationData** 
-
-This hook is triggered when the data of the push notification is loaded. It passes the ExpoPushNotificationModel object and
-and an array of the parsed data from the selected content element. This hook can be used to dynamically alter or extend a 
-the data send with the push notification.
-
-Parameters:
-  - _\Markenzoo\ContaoExpoPushNotificationBundle\Model\ExpoPushNotificationModel_ `$objModel`
-  - _array_ `$arrData`
-
-Return:
-  - _array_ `$arrData - The modified array of data send
-
-Example Usage:
-
-```php
-// src/EventListener/LoadPushNotificationDataListener.php
-namespace App\EventListener;
-
-use Contao\CoreBundle\ServiceAnnotation\Hook;
-use Contao\FrontendTemplate;
-use Contao\Module;
-use Terminal42\ServiceAnnotationBundle\ServiceAnnotationInterface;
-use Markenzoo\ContaoExpoPushNotificationBundle\Model\ExpoPushNotificationModel;
-
-class LoadPushNotificationDataListener implements ServiceAnnotationInterface
-{
-    /**
-     * @Hook("loadPushNotificationData")
-     */
-    public function onLoadPushNotificationData(ExpoPushNotificationModel $objModel, array $arrData): array
-    {
-        // Filter out all empty strings and null values if you don't use them to make message smaller
-        $arrData = array_filter($arrData, function($value) { return !is_null($value) && $value !== ''; });
-
-        // Always make sure to return the modified array
-        return $arrData;
-    }
-}
-```
-
-**parsePushNotificationResponse** 
-
-This hook is triggered after the push notifications have been sent and a http response is returned. It passes 
-an array of the returned HTTP Response which conteins information about each Notification. 
-This hook can be used to dynamically add functionality.
-
-Parameters:
-  - _array_ `$arrData`
-
-Return:
-  - _void_
-
-Example Usage:
-
-```php
-// src/EventListener/ParsePushNotificationResponseListener.php
-namespace App\EventListener;
-
-use Contao\CoreBundle\ServiceAnnotation\Hook;
-use Contao\FrontendTemplate;
-use Contao\Module;
-use Terminal42\ServiceAnnotationBundle\ServiceAnnotationInterface;
-
-class ParsePushNotificationResponseListener implements ServiceAnnotationInterface
-{
-    /**
-     * @Hook("parsePushNotificationResponse")
-     */
-    public function onParsePushNotificationResponse(array $arrData): void
-    {
-        // Loop through each notification and get it's respons
-        foreach ($arrData as $response) {
-            // if something went wrong, the returned status is not ok
-            if ('ok' !== $response['status']) {
-                
-                // Do some custom logic ...
-
-            }
-        }
-    }
-}
-```
 
 ### Further Reading
 
