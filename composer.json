@@ -1,8 +1,9 @@
 {
   "name": "markenzoo/contao-expo-push-notification-bundle",
   "type": "contao-bundle",
+  "version": "1.0.0",
   "description": "Push Notifications for Expo (React Native) in Contao 4",
-  "keywords":["contao","bundle","react", "expo", "app"],
+  "keywords": ["contao","bundle","react", "expo", "app"],
   "homepage": "https://github.com/markenzoo/contao-expo-push-notification-bundle",
   "license": "MIT",
   "authors": [
