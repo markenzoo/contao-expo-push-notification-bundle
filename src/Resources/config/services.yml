@@ -1,8 +1,15 @@
 services:
-    Markenzoo\ContaoExpoPushNotificationBundle\Controller\ExpoPushNotificationController:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    markenzoo_expo_push_notification.expo_push_notification_controller:
+        class: Markenzoo\ContaoExpoPushNotificationBundle\Controller\ExpoPushNotificationController
         tags: ['controller.service_arguments']
 
-    Markenzoo\ContaoExpoPushNotificationBundle\Repository\ExpoPushTokenRepository:
+    markenzoo_expo_push_notification.expo_push_token_repository:
+        class: Markenzoo\ContaoExpoPushNotificationBundle\Repository\ExpoPushTokenRepository
         tags: ['doctrine.repository_service']
         arguments:
             - '@doctrine'
@@ -14,5 +21,5 @@ services:
 
     sc_expo_notifications.notification_manager:
        class: Solvecrew\ExpoNotificationsBundle\Manager\NotificationManager
-       arguments: ['@doctrine.orm.entity_manager', '@sc_expo_notifications.guzzle_client', 'https://exp.host/--/api/v2/push/send']
+       arguments: ['doctrine.orm.default_entity_manager', '@sc_expo_notifications.guzzle_client', 'https://exp.host/--/api/v2/push/send']
        public: true

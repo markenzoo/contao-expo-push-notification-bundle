@@ -24,6 +24,8 @@ use Markenzoo\ContaoExpoPushNotificationBundle\ContaoExpoPushNotificationBundle;
 use Solvecrew\ExpoNotificationsBundle\SCExpoNotificationsBundle;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\Kernel;
+use Contao\ManagerPlugin\Config\ContainerBuilder as PluginContainerBuilder;
 
 class Plugin implements BundlePluginInterface, RoutingPluginInterface
 {
@@ -51,5 +53,27 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
              ->resolve(__DIR__.'/../Resources/config/routing.yml')
              ->load(__DIR__.'/../Resources/config/routing.yml')
          ;
+    }
+
+    /**
+     * Allows a plugin to override extension configuration.
+     *
+     * @param string           $extensionName
+     * @param array            $extensionConfigs
+     * @param PluginContainerBuilder $container
+     *
+     * @return array
+     */
+    public function getExtensionConfig($extensionName, array $extensionConfigs, PluginContainerBuilder $container)
+    {
+        if ('doctrine' === $extensionName && Kernel::VERSION < '4.3') 
+        {    
+            $extensionConfigs[0]['orm']['entity_managers']['default']['mappings']['ContaoExpoPushNotificationBundle'] = [                    
+                "type" => "annotation", 
+                "dir" => '%kernel.project_dir%/src/Entity'
+            ];
+        }
+
+        return $extensionConfigs;
     }
 }
