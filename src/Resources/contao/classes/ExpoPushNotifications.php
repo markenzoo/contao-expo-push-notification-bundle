@@ -61,6 +61,7 @@ class ExpoPushNotifications extends Backend
 
         if (null !== $objNotification->dateSent) {
             Message::addError($GLOBALS['TL_LANG']['tl_expo_push_notification']['response']['duplicate']); // object already sent
+
             return $this->getRedirectResponse();
         }
 
@@ -69,6 +70,7 @@ class ExpoPushNotifications extends Backend
 
         if (empty($recipients)) {
             Message::addError($GLOBALS['TL_LANG']['tl_expo_push_notification']['response']['no_recipients']); // object already sent
+
             return $this->getRedirectResponse();
         }
 
@@ -123,7 +125,7 @@ class ExpoPushNotifications extends Backend
         // Chunk recipients into arrays of 5 to avoid deconding issue when response is to large
         $recipients = array_chunk($recipients, 5);
 
-        // Deliver the notification in chunks 
+        // Deliver the notification in chunks
         foreach ($recipients as $chunk) {
             // generate an array of all notifications to send them in one request
             $notificationContentModels = [];
