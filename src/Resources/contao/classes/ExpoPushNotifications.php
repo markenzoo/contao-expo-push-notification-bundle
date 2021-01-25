@@ -50,7 +50,7 @@ class ExpoPushNotifications extends Backend
      *
      * @return RedirectResponse
      */
-    public function send(DataContainer $dc) //: RedirectResponse
+    public function send(DataContainer $dc)
     {
         // get notification object
         $objNotification = ExpoPushNotificationModel::findByPk($dc->id);
@@ -117,38 +117,44 @@ class ExpoPushNotifications extends Backend
 
         // TODO: android channel ID currently not supported by Solvecrew\ExpoNotificationsBundle
 
-        // generate an array of all notifications to send them in one request
-        $notificationContentModels = [];
-
-        foreach ($recipients as $recipient) {
-            // get token from ExpoPushToken object
-            $token = $recipient->getToken();
-
-            if ($token) {
-                $notificationContentModels[] = ((clone $notificationContentModel)->setTo($token));
-            }
-        }
-
         // get notification managaer from Solvecrew\ExpoNotificationsBundle
         $notificationManager = $this->getNotificationManager();
 
-        // Send the notifications.
-        $httpResponse = $notificationManager->sendNotificationsHttp($notificationContentModels);
+        // Chunk recipients into arrays of 10 to avoid deconding issue when response is to large
+        $recipients = array_chunk($recipients, 10);
 
-        if (isset($GLOBALS['TL_HOOKS']['parsePushNotificationResponse']) && \is_array($GLOBALS['TL_HOOKS']['parsePushNotificationResponse'])) {
-            foreach ($GLOBALS['TL_HOOKS']['parsePushNotificationResponse'] as $callback) {
-                $this->import($callback[0]);
-                $arrData = $this->{$callback[0]}->{$callback[1]}($httpResponse);
-            }
-        }
+        // Deliver the notification in chunks 
+        foreach ($recipients as $chunk) {
+            // generate an array of all notifications to send them in one request
+            $notificationContentModels = [];
 
-        foreach ($httpResponse as $response) {
-            if ('ok' !== $response['status']) {
-                $message = $response['message'];
-                if (\is_array($response['details']) && !empty($response['details'])) {
-                    $message .= ' - '.$response['details'][0];
+            foreach ($chunk as $recipient) {
+                // get token from ExpoPushToken object
+                $token = $recipient->getToken();
+
+                if ($token) {
+                    $notificationContentModels[] = ((clone $notificationContentModel)->setTo($token));
                 }
-                Message::addInfo($message);
+            }
+
+            // Send the notifications.
+            $httpResponse = $notificationManager->sendNotificationsHttp($notificationContentModels);
+
+            if (isset($GLOBALS['TL_HOOKS']['parsePushNotificationResponse']) && \is_array($GLOBALS['TL_HOOKS']['parsePushNotificationResponse'])) {
+                foreach ($GLOBALS['TL_HOOKS']['parsePushNotificationResponse'] as $callback) {
+                    $this->import($callback[0]);
+                    $arrData = $this->{$callback[0]}->{$callback[1]}($httpResponse);
+                }
+            }
+
+            foreach ($httpResponse as $response) {
+                if ('ok' !== $response['status']) {
+                    $message = $response['message'];
+                    if (\is_array($response['details']) && !empty($response['details'])) {
+                        $message .= ' - '.$response['details'][0];
+                    }
+                    Message::addInfo($message);
+                }
             }
         }
 
