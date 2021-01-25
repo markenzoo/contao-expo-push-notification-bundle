@@ -120,8 +120,8 @@ class ExpoPushNotifications extends Backend
         // get notification managaer from Solvecrew\ExpoNotificationsBundle
         $notificationManager = $this->getNotificationManager();
 
-        // Chunk recipients into arrays of 10 to avoid deconding issue when response is to large
-        $recipients = array_chunk($recipients, 10);
+        // Chunk recipients into arrays of 5 to avoid deconding issue when response is to large
+        $recipients = array_chunk($recipients, 5);
 
         // Deliver the notification in chunks 
         foreach ($recipients as $chunk) {
