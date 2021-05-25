@@ -17,7 +17,7 @@
   "require": {
     "php": "^7.2",
     "contao/core-bundle": "^4.9",
-    "symfony/framework-bundle": "^4.4",
+    "symfony/framework-bundle": "^4.4 || ^5.2",
     "solvecrew/expo-notifications-bundle" : "^1.2.1"
   },
   "conflict": {
